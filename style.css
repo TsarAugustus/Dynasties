@@ -1,0 +1,12 @@
+.collapsable span {
+  color: red;
+}
+
+.collapsable {
+  color: blue;
+}
+
+.content {
+  border: 1px solid black;
+  display: none;
+}

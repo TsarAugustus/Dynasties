@@ -1,22 +1,52 @@
 let dynastyList = [];
-let dynastyNames = ['a', 'b', 'c', 'd', 'e', 'f'];
+let dynastyNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 let names = ['John', 'Nick', 'Steve', 'Phil', 'Bob'];
 let numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 
 function displayDynasty() {
-  let member = dynastyList[0].members;
-  for(let dynasty in member) {
-    let text;
-    let element = document.createElement('span')
-    if(member[dynasty].founder) {
-      text = member[dynasty].name + ' ' + numerals[0] + ' founded this dynasty in ' + member[dynasty].reignStart;
-    } else {
-      text = member[dynasty].name + ' ' + numerals[member[dynasty].iteration - 1] + ' was next in line to the throne of ' + member[dynasty-1].name + ' ' + (numerals[member[dynasty-1].iteration - 1]);
+  for(let i=0; i<dynastyList.length; i++) {
+    let dynastyDiv = document.createElement('span');
+    dynastyDiv.id = i;
+    dynastyDiv.classList.add('collapsable')
+    dynastyDiv.innerHTML = '<p>Dynasty of ' + dynastyList[i].name + '</p>';
+    let member = dynastyList[i].members;
+    for(let dynasty in member) {
+      let text;
+      let element = document.createElement('span');
+      element.id = 'member-'+ dynastyList[i].name + '-' + dynasty;
+      element.classList.add('content')
+      if(member[dynasty].founder) {
+        text = member[dynasty].name + ' ' + numerals[0] + ' founded this dynasty in ' + member[dynasty].reignStart;
+      } else {
+        text = member[dynasty].name + ' ' + numerals[member[dynasty].iteration - 1] + ' was next in line to the throne of ' + member[dynasty-1].name + ' ' + (numerals[member[dynasty-1].iteration - 1]) + '. Their reign started on ' + member[dynasty].reignStart;
+      }
+      text = text + '. They were born on ' + member[dynasty].birth + ', and died on ' + member[dynasty].death;
+      element.innerHTML = text + '</br>';
+      dynastyDiv.appendChild(element);
+      // document.getElementById('dynasty').appendChild(element);
+      // console.log(dynasty)
     }
-    text = text + '. They were born on ' + member[dynasty].birth + ', and died on ' + member[dynasty].death;
-    element.innerHTML = text + '</br>' + '</br>';
-    document.getElementById('dynasty').appendChild(element);
-    console.log(dynasty)
+    document.getElementById('dynastyList').appendChild(dynastyDiv);
+  }
+  let coll = document.getElementsByClassName('collapsable');
+
+  for(let i=0; i<coll.length;i++) {
+    coll[i].addEventListener('click', function() {
+      // console.log(dynastyList[coll[i].id].members)
+      for(let j=0; j<dynastyList[coll[i].id].members.length; j++) {
+        // console.log(i)
+        console.log(dynastyList[coll[i].id]);
+        let thisDoc = document.getElementById('member-' + dynastyList[coll[i].id].name + '-' + j);
+        if(thisDoc.style.display === 'block') {
+          thisDoc.style.display = "none";
+        } else {
+          thisDoc.style.display = "block";
+        }
+      }
+      // // console.log(dynastyList[this.id].members)
+      // let content = this.nextElementSibling;
+      //
+    });
   }
 }
 

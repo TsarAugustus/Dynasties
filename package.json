@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/TsarAugustus/Dynasties/issues"
   },
-  "homepage": "https://github.com/TsarAugustus/Dynasties#readme"
+  "homepage": "https://github.com/TsarAugustus/Dynasties#readme",
+  "dependencies": {
+    "nodemon": "^2.0.6"
+  }
 }

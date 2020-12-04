@@ -1,6 +1,24 @@
 let dynastyList = [];
 let dynastyNames = ['a', 'b', 'c', 'd', 'e', 'f'];
 let names = ['John', 'Nick', 'Steve', 'Phil', 'Bob'];
+let numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+
+function displayDynasty() {
+  let member = dynastyList[0].members;
+  for(let dynasty in member) {
+    let text;
+    let element = document.createElement('span')
+    if(member[dynasty].founder) {
+      text = member[dynasty].name + ' ' + numerals[0] + ' founded this dynasty in ' + member[dynasty].reignStart;
+    } else {
+      text = member[dynasty].name + ' ' + numerals[member[dynasty].iteration - 1] + ' was next in line to the throne of ' + member[dynasty-1].name + ' ' + (numerals[member[dynasty-1].iteration - 1]);
+    }
+    text = text + '. They were born on ' + member[dynasty].birth + ', and died on ' + member[dynasty].death;
+    element.innerHTML = text + '</br>' + '</br>';
+    document.getElementById('dynasty').appendChild(element);
+    console.log(dynasty)
+  }
+}
 
 function generateChildren(dynasty, memberIteration) {
   let childArray = [];
@@ -45,10 +63,6 @@ function generateChildren(dynasty, memberIteration) {
   function checkNames(heirName) {
     for(let i=0; i < dynasty.preferredRulerNames.length; i++) {
       if(heirName === dynasty.preferredRulerNames[i].name) {
-        console.log('name exists', childArray[0].iteration, dynasty.preferredRulerNames[i].iteration)
-
-        // dynasty.preferredRulerNames[i].iteration++;
-        // dynasty.preferredRulerNames[i].iteration; //= childArray[0].iteration;
         return dynasty.preferredRulerNames[i];
       }
     }
@@ -57,7 +71,6 @@ function generateChildren(dynasty, memberIteration) {
   }
   // console.log(checkNames())
   if(checkNames(childArray[0].name) === false) {
-    // console.log('false', childArray[0].name);
     let newPrn = {
       name: childArray[0].name,
       iteration: 1
@@ -67,7 +80,6 @@ function generateChildren(dynasty, memberIteration) {
 
     checkNames(childArray[0].name).iteration++;
     childArray[0].iteration = checkNames(childArray[0].name).iteration;
-    console.log(childArray[0].iteration);
   }
 
   childArray[0].heir = true;
@@ -126,7 +138,6 @@ function generateDynasty(uniqueDynasties, heirAmt) {
 
         let previousMember = dynasty.members[j-1];
         let previousHeir = previousMember.children[0];
-        // console.log(member)
         member.name = previousHeir.name;
         member.birth = previousHeir.birth;
         member.death = previousHeir.death;
@@ -140,7 +151,17 @@ function generateDynasty(uniqueDynasties, heirAmt) {
     }
     dynastyList.push(dynasty)
   }
-  console.log(dynastyList[0])
-}
 
-generateDynasty(1, 5);
+  displayDynasty();
+}
+// let form = document.getElementById('form')
+document.getElementById('formSubmit').addEventListener('click', function(e) {
+  let dynastyAmt = document.form.dynastyAmt.value;
+  let memberAmt = document.form.memberAmt.value;
+  generateDynasty(dynastyAmt, memberAmt)
+
+  e.preventDefault();
+  // document.getElementById('dynastyForm').value
+})
+
+// generateDynasty(1, 5);

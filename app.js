@@ -1,51 +1,117 @@
 let dynastyList = [];
-let dynastyNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-let names = ['John', 'Nick', 'Steve', 'Phil', 'Bob'];
-let numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+let dynastyNames;
+let names;
+
+//shamelessly stole from stack overflow
+//https://stackoverflow.com/questions/9083037/convert-a-number-into-a-roman-numeral-in-javascript
+function conversion(num) {
+  if (isNaN(num))
+        return NaN;
+    var digits = String(+num).split(""),
+        key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
+               "","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
+               "","I","II","III","IV","V","VI","VII","VIII","IX"],
+        roman = "",
+        i = 3;
+    while (i--)
+        roman = (key[+digits.pop() + (i * 10)] || "") + roman;
+    return Array(+digits.join("") + 1).join("M") + roman;
+}
+
+let numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 
+                'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX',
+                'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI', 'XXVII', 'XXVIII', 'XXIX', 'XXX'];
+
+function generateNames(args) {
+  let newWords = [];
+  let vowel = ['a', 'e', 'i', 'o', 'u'];
+  let consonant = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z'];
+  //generate 30 random words
+  for(let i=0; i < 30; i++) {
+    let currentWord = [];
+
+    //generates word length. longer words are less likely
+    let wordLength = Math.floor(Math.pow(Math.random() * (3 - 2) + 2, Math.random() * (2.2 - 1.5) + 1.5)); //idk what the right length is, but this is close
+    let chance;
+    chance = Math.random();
+
+    //I don't like the current word generation. Need more looking into.
+    for(let j=0; j < wordLength; j++) {
+      if(j >= 2) {
+        for(let letter of consonant) {
+          if(currentWord[j-1] === letter) {
+            chance = 0;
+            break;
+          }
+        }
+      }
+
+      if(chance < 0.5) {
+        currentWord.push(vowel[Math.floor(Math.random() * vowel.length)]);
+        chance = Math.random()
+      } else {
+        currentWord.push(consonant[Math.floor(Math.random() * consonant.length)]);
+        chance = Math.random()
+      }
+
+    }
+    currentWord = currentWord.join('');
+    newWords[i] = currentWord.charAt(0).toUpperCase() + currentWord.slice(1);
+  }
+  if(args === 'dynastyNames') {
+    dynastyNames = newWords;
+  } else {
+    names = newWords;
+  }
+}
 
 function displayDynasty() {
   for(let i=0; i<dynastyList.length; i++) {
-    let dynastyDiv = document.createElement('span');
+    let dynastyDiv = document.createElement('div');
     dynastyDiv.id = i;
-    dynastyDiv.classList.add('collapsable')
+    dynastyDiv.classList.add('collapsable');
     dynastyDiv.innerHTML = '<p>Dynasty of ' + dynastyList[i].name + '</p>';
     let member = dynastyList[i].members;
     for(let dynasty in member) {
       let text;
-      let element = document.createElement('span');
+      let element = document.createElement('p');
       element.id = 'member-'+ dynastyList[i].name + '-' + dynasty;
-      element.classList.add('content')
+      element.classList.add('hidden') 
       if(member[dynasty].founder) {
-        text = member[dynasty].name + ' ' + numerals[0] + ' founded this dynasty in ' + member[dynasty].reignStart;
+        text = member[dynasty].name + ' ' + conversion(member[dynasty].iteration) + ' founded this dynasty in ' + member[dynasty].reignStart;
       } else {
-        text = member[dynasty].name + ' ' + numerals[member[dynasty].iteration - 1] + ' was next in line to the throne of ' + member[dynasty-1].name + ' ' + (numerals[member[dynasty-1].iteration - 1]) + '. Their reign started on ' + member[dynasty].reignStart;
+        text = member[dynasty].name + ' ' + conversion(member[dynasty].iteration) + ' was next in line to the throne of ' + member[dynasty-1].name + ' ' + (numerals[member[dynasty-1].iteration - 1]) + '. Their reign started on ' + member[dynasty].reignStart;
       }
       text = text + '. They were born on ' + member[dynasty].birth + ', and died on ' + member[dynasty].death;
       element.innerHTML = text + '</br>';
       dynastyDiv.appendChild(element);
-      // document.getElementById('dynasty').appendChild(element);
-      // console.log(dynasty)
     }
     document.getElementById('dynastyList').appendChild(dynastyDiv);
   }
   let coll = document.getElementsByClassName('collapsable');
 
+  //first, iterate through all collapsable items
+  
   for(let i=0; i<coll.length;i++) {
-    coll[i].addEventListener('click', function() {
-      // console.log(dynastyList[coll[i].id].members)
-      for(let j=0; j<dynastyList[coll[i].id].members.length; j++) {
-        // console.log(i)
-        console.log(dynastyList[coll[i].id]);
-        let thisDoc = document.getElementById('member-' + dynastyList[coll[i].id].name + '-' + j);
-        if(thisDoc.style.display === 'block') {
-          thisDoc.style.display = "none";
-        } else {
-          thisDoc.style.display = "block";
-        }
+    coll[i].addEventListener('click', function() { 
+      //then find the members inside that dynasty
+      
+      for(let j=0; j < dynastyList[coll[i].id].members.length; j++) {
+          let member = document.getElementById('member-' + dynastyList[coll[i].id].name + '-' + j);
+          //this is necessary to stop the child elements from affecting the parents
+          member.addEventListener('click', function(e) {
+            console.log('in here')
+            e.stopPropagation();
+          })
+          // then apply the expand class, if it has been clicked
+          if(coll[i].classList.contains('expand')) {
+            member.classList.add('hidden');
+            coll[i].classList.remove('expand')
+          } else {
+            member.classList.remove('hidden');
+            coll[i].classList.add('expand');
+          }
       }
-      // // console.log(dynastyList[this.id].members)
-      // let content = this.nextElementSibling;
-      //
     });
   }
 }
@@ -136,11 +202,12 @@ function generateDynasty(uniqueDynasties, heirAmt) {
         iteration: undefined
       }]
     }
-
+    generateNames('dynastyNames');
     dynasty.name = dynastyNames[Math.floor(Math.random() * dynastyNames.length)];
     //then generate the members of the dynastyList
     for(let j=0; j<heirAmt; j++) {
       if(j == 0) {
+        generateNames();
         let member = dynasty.members[j];
         member.name = names[Math.floor(Math.random() * names.length)];
         member.birth = Math.floor(Math.random() * (2000 - 0) + 0);
@@ -184,14 +251,11 @@ function generateDynasty(uniqueDynasties, heirAmt) {
 
   displayDynasty();
 }
-// let form = document.getElementById('form')
+
 document.getElementById('formSubmit').addEventListener('click', function(e) {
   let dynastyAmt = document.form.dynastyAmt.value;
   let memberAmt = document.form.memberAmt.value;
   generateDynasty(dynastyAmt, memberAmt)
 
   e.preventDefault();
-  // document.getElementById('dynastyForm').value
-})
-
-// generateDynasty(1, 5);
+});

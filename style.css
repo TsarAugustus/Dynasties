@@ -1,12 +1,8 @@
-.collapsable span {
-  color: red;
-}
-
-.collapsable {
-  color: blue;
-}
-
-.content {
-  border: 1px solid black;
+.hidden {
   display: none;
+}
+
+.member {
+  display: block;
+  color: chocolate;
 }

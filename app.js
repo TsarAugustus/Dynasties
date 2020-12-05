@@ -88,29 +88,38 @@ function displayDynasty() {
     }
     document.getElementById('dynastyList').appendChild(dynastyDiv);
   }
+
   let coll = document.getElementsByClassName('collapsable');
+  function expand(i, bool) {
+    for(let j=0; j < dynastyList[coll[i].id].members.length; j++) {
+      let member = document.getElementById('member-' + dynastyList[coll[i].id].name + '-' + j);
+      if(bool) {
+        member.classList.remove('hidden');
+      } else {
+        member.classList.add('hidden'); 
+      }
+      
+
+      member.addEventListener('click', function(e) { //this is necessary to stop the child elements from affecting the parents
+        console.log('in here')
+        e.stopPropagation();
+      })
+    }
+  }
 
   //first, iterate through all collapsable items
-  
   for(let i=0; i<coll.length;i++) {
     coll[i].addEventListener('click', function() { 
       //then find the members inside that dynasty
-      
-      for(let j=0; j < dynastyList[coll[i].id].members.length; j++) {
-          let member = document.getElementById('member-' + dynastyList[coll[i].id].name + '-' + j);
-          //this is necessary to stop the child elements from affecting the parents
-          member.addEventListener('click', function(e) {
-            console.log('in here')
-            e.stopPropagation();
-          })
-          // then apply the expand class, if it has been clicked
-          if(coll[i].classList.contains('expand')) {
-            member.classList.add('hidden');
-            coll[i].classList.remove('expand')
-          } else {
-            member.classList.remove('hidden');
-            coll[i].classList.add('expand');
-          }
+      // then apply the expand class, if it has been clicked
+      if(!coll[i].classList.contains('expand')) {
+        // member.classList.add('hidden');
+        coll[i].classList.add('expand')
+        expand(i, true)
+      } else {
+        // member.classList.remove('hidden');
+        coll[i].classList.remove('expand');
+        expand(i, false);
       }
     });
   }

@@ -18,10 +18,6 @@ function conversion(num) {
     return Array(+digits.join("") + 1).join("M") + roman;
 }
 
-let numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 
-                'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX',
-                'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI', 'XXVII', 'XXVIII', 'XXIX', 'XXX'];
-
 function generateNames(args) {
   let newWords = [];
   let vowel = ['a', 'e', 'i', 'o', 'u'];
@@ -76,11 +72,11 @@ function displayDynasty() {
       let text;
       let element = document.createElement('p');
       element.id = 'member-'+ dynastyList[i].name + '-' + dynasty;
-      element.classList.add('hidden') 
+      element.classList.add('hidden');
       if(member[dynasty].founder) {
         text = member[dynasty].name + ' ' + conversion(member[dynasty].iteration) + ' founded this dynasty in ' + member[dynasty].reignStart;
       } else {
-        text = member[dynasty].name + ' ' + conversion(member[dynasty].iteration) + ' was next in line to the throne of ' + member[dynasty-1].name + ' ' + (numerals[member[dynasty-1].iteration - 1]) + '. Their reign started on ' + member[dynasty].reignStart;
+        text = member[dynasty].name + ' ' + conversion(member[dynasty].iteration) + ' was next in line to the throne of ' + member[dynasty-1].name + ' ' + conversion(member[dynasty - 1].iteration) + '. Their reign started on ' + member[dynasty].reignStart;
       }
       text = text + '. They were born on ' + member[dynasty].birth + ', and died on ' + member[dynasty].death;
       element.innerHTML = text + '</br>';
@@ -101,9 +97,25 @@ function displayDynasty() {
       
 
       member.addEventListener('click', function(e) { //this is necessary to stop the child elements from affecting the parents
-        console.log('in here')
+
+        let children = dynastyList[coll[i].id].members[j].children;
+        if(!member.classList.contains('showChildren')) {
+          member.classList.add('showChildren');
+          for(let k=0; k < children.length; k++) {
+            let childElement = document.createElement('span');
+            childElement.innerHTML = children[k].name;
+            childElement.classList.add('child');
+            member.appendChild(childElement);
+          }
+        } else {
+          member.classList.remove('showChildren');
+          for(let k=0; k < children.length; k++) {
+            member.removeChild(member.lastChild);
+          }
+        }
+        let childrenArray = [];
         e.stopPropagation();
-      })
+      });
     }
   }
 
@@ -138,13 +150,13 @@ function generateChildren(dynasty, memberIteration) {
       iteration: 1
     };
 
+    //TODO: FIX MUTATIONS
     if(memberIteration >= 1) {
       let mutateChance = Math.random();
       newChild.birth = Math.floor(Math.random() * (dynasty.members[memberIteration - 1].death - (dynasty.members[memberIteration - 1].birth + 14)) + (dynasty.members[memberIteration - 1].birth + 14));
       newChild.death = newChild.birth + (Math.floor(Math.random() * (70 - 14) + 14))
       newChild.age = (newChild.death - newChild.birth);
       if(mutateChance >= 0.9) {
-        console.log('mutation');
         newChild.name = names[Math.floor(Math.random() * names.length)]
       } else {
         newChild.name = dynasty.preferredRulerNames[Math.floor(Math.random() * dynasty.preferredRulerNames.length)].name;
@@ -156,7 +168,6 @@ function generateChildren(dynasty, memberIteration) {
       newChild.death = newChild.birth + (Math.floor(Math.random() * (70 - 14) + 14))
       newChild.age = (newChild.death - newChild.birth);
       if(mutateChance >= 0.9) {
-        console.log('mutation');
         newChild.name = names[Math.floor(Math.random() * names.length)]
       } else {
         newChild.name = dynasty.preferredRulerNames[Math.floor(Math.random() * dynasty.preferredRulerNames.length)].name;
@@ -171,10 +182,10 @@ function generateChildren(dynasty, memberIteration) {
         return dynasty.preferredRulerNames[i];
       }
     }
-    console.log('no name')
+    
     return false;
   }
-  // console.log(checkNames())
+
   if(checkNames(childArray[0].name) === false) {
     let newPrn = {
       name: childArray[0].name,
@@ -264,6 +275,7 @@ function generateDynasty(uniqueDynasties, heirAmt) {
 document.getElementById('formSubmit').addEventListener('click', function(e) {
   let dynastyAmt = document.form.dynastyAmt.value;
   let memberAmt = document.form.memberAmt.value;
+  window.alert('This will generate approximately ' + memberAmt * 17 + ' years. Are you sure?');
   generateDynasty(dynastyAmt, memberAmt)
 
   e.preventDefault();

@@ -147,26 +147,36 @@ function generateChildren(dynasty, memberIteration) {
       death: undefined,
       age: undefined,
       heir: false,
+      parents: [],
       iteration: 1
     };
 
     //TODO: FIX MUTATIONS
-    if(memberIteration >= 1) {
+    if(memberIteration >= 1) { //succeeding members
       let mutateChance = Math.random();
       newChild.birth = Math.floor(Math.random() * (dynasty.members[memberIteration - 1].death - (dynasty.members[memberIteration - 1].birth + 14)) + (dynasty.members[memberIteration - 1].birth + 14));
       newChild.death = newChild.birth + (Math.floor(Math.random() * (70 - 14) + 14))
       newChild.age = (newChild.death - newChild.birth);
+      newChild.parents = findParents(dynasty, memberIteration)
       if(mutateChance >= 0.9) {
         newChild.name = names[Math.floor(Math.random() * names.length)]
       } else {
-        newChild.name = dynasty.preferredRulerNames[Math.floor(Math.random() * dynasty.preferredRulerNames.length)].name;
+        //the first born should naturally be named after the parent
+        //but this does generate closer to natural history succession
+        if(memberIteration >=2 && childArray.length < 1 && Math.random() > 0.4) {
+          newChild.name = dynasty.members[memberIteration -2].name;
+        } else {
+          newChild.name = dynasty.preferredRulerNames[Math.floor(Math.random() * dynasty.preferredRulerNames.length)].name;
+        }
+        
       }
       childArray.push(newChild);
-    } else {
+    } else { //founder info
       let mutateChance = Math.random();
       newChild.birth = Math.floor(Math.random() * (dynasty.members[memberIteration].death - (dynasty.members[memberIteration].birth + 14)) + (dynasty.members[memberIteration].birth + 14));
       newChild.death = newChild.birth + (Math.floor(Math.random() * (70 - 14) + 14))
       newChild.age = (newChild.death - newChild.birth);
+      newChild.parents = findParents(dynasty, memberIteration)
       if(mutateChance >= 0.9) {
         newChild.name = names[Math.floor(Math.random() * names.length)]
       } else {
@@ -182,7 +192,7 @@ function generateChildren(dynasty, memberIteration) {
         return dynasty.preferredRulerNames[i];
       }
     }
-    
+
     return false;
   }
 
@@ -202,6 +212,17 @@ function generateChildren(dynasty, memberIteration) {
   return childArray;
 }
 
+function findParents(dynastyName, iteration) {
+
+  if(iteration === 0) {
+    //generate foudning mythos
+    console.log('here')
+    return {name: 'The Gods'};
+  } else {
+    return dynastyName.members[iteration-1];
+  }
+}
+
 function generateDynasty(uniqueDynasties, heirAmt) {
   //first, generate the individual dynasty (not including members)
   for(let i=0; i<uniqueDynasties; i++) {
@@ -215,7 +236,8 @@ function generateDynasty(uniqueDynasties, heirAmt) {
         reignEnd: undefined,
         founder: undefined,
         iteration: undefined,
-        children: []
+        children: [],
+        parents: []
       }],
       preferredRulerNames: [{
         name: undefined,
@@ -226,6 +248,7 @@ function generateDynasty(uniqueDynasties, heirAmt) {
     dynasty.name = dynastyNames[Math.floor(Math.random() * dynastyNames.length)];
     //then generate the members of the dynastyList
     for(let j=0; j<heirAmt; j++) {
+      //generate founding member
       if(j == 0) {
         generateNames();
         let member = dynasty.members[j];
@@ -240,6 +263,7 @@ function generateDynasty(uniqueDynasties, heirAmt) {
         member.founder = true;
         member.iteration = 1;
         member.children = generateChildren(dynasty, j);
+        member.parents = findParents(dynasty, j)
       } else {
         let member = {
           name: undefined,
@@ -249,7 +273,8 @@ function generateDynasty(uniqueDynasties, heirAmt) {
           reignEnd: undefined,
           founder: undefined,
           iteration: undefined,
-          children: []
+          children: [],
+          parents: []
         };
 
 
@@ -263,19 +288,20 @@ function generateDynasty(uniqueDynasties, heirAmt) {
         member.founder = false;
         member.iteration = previousHeir.iteration;
         member.children = generateChildren(dynasty, j);
+        member.parents = findParents(dynasty, j)
         dynasty.members.push(member)
       }
     }
     dynastyList.push(dynasty)
   }
-
+  console.log(dynastyList)
   displayDynasty();
 }
 
 document.getElementById('formSubmit').addEventListener('click', function(e) {
   let dynastyAmt = document.form.dynastyAmt.value;
   let memberAmt = document.form.memberAmt.value;
-  window.alert('This will generate approximately ' + memberAmt * 17 + ' years. Are you sure?');
+  // window.alert('This will generate approximately ' + memberAmt * 17 + ' years. Are you sure?');
   generateDynasty(dynastyAmt, memberAmt)
 
   e.preventDefault();

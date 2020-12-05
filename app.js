@@ -105,6 +105,12 @@ function displayDynasty() {
             let childElement = document.createElement('span');
             childElement.innerHTML = children[k].name;
             childElement.classList.add('child');
+            childElement.addEventListener('click', function(e) {
+              // stops the children from collapsing the parent.
+              // probably a better and more efficient way to do this
+              // TODO: FIX HOW MANY EVENT LISTENERS AND LOOPS THERE ARE
+              e.stopPropagation();
+            })
             member.appendChild(childElement);
           }
         } else {
@@ -157,7 +163,7 @@ function generateChildren(dynasty, memberIteration) {
       newChild.birth = Math.floor(Math.random() * (dynasty.members[memberIteration - 1].death - (dynasty.members[memberIteration - 1].birth + 14)) + (dynasty.members[memberIteration - 1].birth + 14));
       newChild.death = newChild.birth + (Math.floor(Math.random() * (70 - 14) + 14))
       newChild.age = (newChild.death - newChild.birth);
-      newChild.parents = findParents(dynasty, memberIteration)
+      newChild.parents = findParents(dynasty, memberIteration, false)
       if(mutateChance >= 0.9) {
         newChild.name = names[Math.floor(Math.random() * names.length)]
       } else {
@@ -176,7 +182,7 @@ function generateChildren(dynasty, memberIteration) {
       newChild.birth = Math.floor(Math.random() * (dynasty.members[memberIteration].death - (dynasty.members[memberIteration].birth + 14)) + (dynasty.members[memberIteration].birth + 14));
       newChild.death = newChild.birth + (Math.floor(Math.random() * (70 - 14) + 14))
       newChild.age = (newChild.death - newChild.birth);
-      newChild.parents = findParents(dynasty, memberIteration)
+      newChild.parents = findParents(dynasty, memberIteration, false)
       if(mutateChance >= 0.9) {
         newChild.name = names[Math.floor(Math.random() * names.length)]
       } else {
@@ -212,14 +218,15 @@ function generateChildren(dynasty, memberIteration) {
   return childArray;
 }
 
-function findParents(dynastyName, iteration) {
+function findParents(dynastyName, iteration, args) {
 
-  if(iteration === 0) {
-    //generate foudning mythos
-    console.log('here')
-    return {name: 'The Gods'};
-  } else {
-    return dynastyName.members[iteration-1];
+  //if this is the founder, generate a mythos
+  if(args === true) {
+    return {name: 'The Gods'}
+  } else if(args === false && dynastyName.members[iteration - 1] != undefined) { //or, return the previous member if not the founder
+    return dynastyName.members[iteration -1];
+  } else if(args === false && iteration === 0 ) { // this bit check if it is the children of the founder, and assigns the parents accordingly
+    return dynastyName.members[0];
   }
 }
 
@@ -263,7 +270,7 @@ function generateDynasty(uniqueDynasties, heirAmt) {
         member.founder = true;
         member.iteration = 1;
         member.children = generateChildren(dynasty, j);
-        member.parents = findParents(dynasty, j)
+        member.parents = findParents(dynasty, j, true)
       } else {
         let member = {
           name: undefined,
@@ -288,20 +295,19 @@ function generateDynasty(uniqueDynasties, heirAmt) {
         member.founder = false;
         member.iteration = previousHeir.iteration;
         member.children = generateChildren(dynasty, j);
-        member.parents = findParents(dynasty, j)
+        member.parents = findParents(dynasty, j, false)
         dynasty.members.push(member)
       }
     }
     dynastyList.push(dynasty)
   }
-  console.log(dynastyList)
   displayDynasty();
 }
 
 document.getElementById('formSubmit').addEventListener('click', function(e) {
   let dynastyAmt = document.form.dynastyAmt.value;
   let memberAmt = document.form.memberAmt.value;
-  // window.alert('This will generate approximately ' + memberAmt * 17 + ' years. Are you sure?');
+  window.alert('This will generate approximately ' + memberAmt * 17 + ' years. Are you sure?');
   generateDynasty(dynastyAmt, memberAmt)
 
   e.preventDefault();

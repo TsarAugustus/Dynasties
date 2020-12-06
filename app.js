@@ -75,10 +75,14 @@ function displayDynasty() {
       element.classList.add('hidden');
       if(member[dynasty].founder) {
         text = member[dynasty].name + ' ' + conversion(member[dynasty].iteration) + ' founded this dynasty in ' + member[dynasty].reignStart;
+        let pt = member[dynasty].traits.personalityTrait.name;
+        let lt = member[dynasty].traits.leaderTrait.name;
+        let ht = member[dynasty].traits.healthTrait.name;
+        text = text + '</br> They were known to be ' + pt + ' towards others, and took a liking to the ' + lt + '\'s of their realm. Commoners would remark about their ' + ht + ' figure';
       } else {
         text = member[dynasty].name + ' ' + conversion(member[dynasty].iteration) + ' was next in line to the throne of ' + member[dynasty-1].name + ' ' + conversion(member[dynasty - 1].iteration) + '. Their reign started on ' + member[dynasty].reignStart;
       }
-      text = text + '. They were born on ' + member[dynasty].birth + ', and died on ' + member[dynasty].death;
+      text = text + '. </br> They were born on ' + member[dynasty].birth + ', and died on ' + member[dynasty].death;
       element.innerHTML = text + '</br>';
       dynastyDiv.appendChild(element);
     }
@@ -143,6 +147,157 @@ function displayDynasty() {
   }
 }
 
+function calculateHealth(dynastyName, iteration) {  
+  let previousMemberHealth = undefined;
+  let memberTraits = {
+    leaderTrait: {
+      name: undefined,
+      type: undefined
+    },
+    personalityTrait: {
+      name: undefined,
+      type: undefined
+    },
+    healthTrait: {
+      name: undefined,
+      type: undefined
+    }
+  }
+
+  //if there is a parent, get their traits
+  if(dynastyName.members[iteration - 1]) {
+    
+  } else { //if this is the founder, generate new traits and jazz
+
+  }
+  //generate overall health
+  let healthNum = Math.random();
+  let personalityTraitChance = Math.random();
+  
+  //variables for controlling the 'randomness'
+  let healthy = 0.5; // healthy stuff
+  let healthyPos = 0.3;
+  let healthyNeut = 0.4;
+
+  let neutral = 0.3; //neutral stuff
+  let neutralPos = 0.8;
+  let neutralNeut = 0.2;
+
+  //ill is always less than neutral
+  let illPos = 0.9;
+  let illNeut = 0.5;  
+
+  //essentially, if healthNum is above the healthy var, then the character is healthy
+  //otherwise, if they are  above the neutral range, but not healthy, then they are neutral
+  // or they are ill, if they are below the neutral threshold
+  if(healthNum >= healthy) { //healthy
+    memberTraits.healthTrait.type = 'positive';
+    if(personalityTraitChance >= healthyPos) {
+      memberTraits.personalityTrait.type = 'positive';
+    } else if (personalityTraitChance >= healthyNeut) {
+      memberTraits.personalityTrait.type = 'neutral';
+    } else {
+      memberTraits.personalityTrait.type = 'negative';
+    }
+  } else if(healthNum >= neutral) { //neutral 
+    memberTraits.healthTrait.type = 'neutral';
+    if(personalityTraitChance >= neutralPos) {
+      memberTraits.personalityTrait.type = 'positive';
+    } else if (personalityTraitChance >= neutralNeut) {
+      memberTraits.personalityTrait.type = 'neutral';
+    } else {
+      memberTraits.personalityTrait.type = 'negative';
+    }
+  } else { //ill
+    memberTraits.healthTrait.type = 'negative';
+    if(personalityTraitChance >= illPos) {
+      memberTraits.personalityTrait.type = 'positive';
+    } else if (personalityTraitChance >= illNeut) {
+      memberTraits.personalityTrait.type = 'neutral';
+    } else {
+      memberTraits.personalityTrait.type = 'negative';
+    }
+  }
+  let netScore = 0;
+  for(let traitType in memberTraits) {
+    if(traitType != 'leaderTrait') {
+      if(memberTraits[traitType].type === 'positive') {
+        netScore = netScore + 0.5;
+      } else if (memberTraits[traitType].type === 'negative') {
+        netScore = netScore - 0.5;
+      }
+    }
+  }
+
+  //probably a better way
+  //but I also need to fix how traits are applied
+  //TODO: FIX ALL THIS
+  if(netScore > 0.5) { //good healthy leader
+    memberTraits.leaderTrait.type = 'full-good';
+  } else if (netScore === 0.5) { //good semi competent
+    memberTraits.leaderTrait.type = 'semi-good';
+  } else if (netScore === 0) { //neutral
+    memberTraits.leaderTrait.type = 'true-neutral';
+  } else if (netScore === -0.5) { //bad semi competent
+    memberTraits.leaderTrait.type = 'semi-bad';
+  } else { //evil and sickly
+    memberTraits.leaderTrait.type = 'full-bad';
+  }
+  let leaderTypes = {
+    'full-good': [
+      'Philosopher', 'Scholar'
+    ],
+    'semi-good': [
+      'Senator', 'Commander'
+    ],
+    'true-neutral': [
+      'Adventurer', 'Tinkerer'
+    ],
+    'semi-bad': [
+      'Gambler', 'Con Artist'
+    ],
+    'full-bad': [
+      'Mad Scientist', 'Addict'
+    ]
+  };
+
+  let personalityTypes = {
+    'positive': [
+      'Stoic', 'Gregarious', 'Intelligent'
+    ],
+    'neutral': [
+      'Curious', 'Bored', 'Longing'
+    ],
+    'negative': [
+      'Cruel', 'Apathetic', 'Mean'
+    ]
+  };
+
+  let healthTypes = {
+    'positive': [
+      'Brawny', 'Strong', 'Handsome'
+    ],
+    'neutral': [
+      'Thin', 'Well Rested', 'Content'
+    ],
+    'negative': [
+      'Sickly', 'Frail', 'Obese'
+    ]
+  }
+  memberTraits.leaderTrait.name = leaderTypes[memberTraits.leaderTrait.type][Math.floor(Math.random() * leaderTypes[memberTraits.leaderTrait.type].length)];
+  memberTraits.personalityTrait.name = personalityTypes[memberTraits.personalityTrait.type][Math.floor(Math.random() * personalityTypes[memberTraits.personalityTrait.type].length)]
+  memberTraits.healthTrait.name = healthTypes[memberTraits.healthTrait.type][Math.floor(Math.random() * healthTypes[memberTraits.healthTrait.type].length)];
+
+  let pt = memberTraits.personalityTrait.name;
+  let lt = memberTraits.leaderTrait.name;
+  let ht = memberTraits.healthTrait.name;
+  // PT = personalityType, LT = leaderType, HT = healthType
+  //they were known to be PT towards others, and took a liking to the LT of their realm. Commoners would remark about their HT figure.
+  return memberTraits
+  // console.log('They were known to be ' + pt + ' towards others, and took a liking to the ' + lt + '\'s of their realm. Commoners would remark about their ' + ht + ' figure');
+
+} 
+
 function generateChildren(dynasty, memberIteration) {
   let childArray = [];
   let numChildren = Math.floor(Math.random() * 5) + 1;
@@ -153,6 +308,7 @@ function generateChildren(dynasty, memberIteration) {
       death: undefined,
       age: undefined,
       heir: false,
+      health: undefined,
       parents: [],
       iteration: 1
     };
@@ -182,7 +338,7 @@ function generateChildren(dynasty, memberIteration) {
       newChild.birth = Math.floor(Math.random() * (dynasty.members[memberIteration].death - (dynasty.members[memberIteration].birth + 14)) + (dynasty.members[memberIteration].birth + 14));
       newChild.death = newChild.birth + (Math.floor(Math.random() * (70 - 14) + 14))
       newChild.age = (newChild.death - newChild.birth);
-      newChild.parents = findParents(dynasty, memberIteration, false)
+      newChild.parents = findParents(dynasty, memberIteration, false);
       if(mutateChance >= 0.9) {
         newChild.name = names[Math.floor(Math.random() * names.length)]
       } else {
@@ -242,6 +398,7 @@ function generateDynasty(uniqueDynasties, heirAmt) {
         reignStart: undefined,
         reignEnd: undefined,
         founder: undefined,
+        traits: undefined,
         iteration: undefined,
         children: [],
         parents: []
@@ -270,7 +427,8 @@ function generateDynasty(uniqueDynasties, heirAmt) {
         member.founder = true;
         member.iteration = 1;
         member.children = generateChildren(dynasty, j);
-        member.parents = findParents(dynasty, j, true)
+        member.parents = findParents(dynasty, j, true);
+        member.traits = calculateHealth(dynasty, j);
       } else {
         let member = {
           name: undefined,
@@ -307,7 +465,7 @@ function generateDynasty(uniqueDynasties, heirAmt) {
 document.getElementById('formSubmit').addEventListener('click', function(e) {
   let dynastyAmt = document.form.dynastyAmt.value;
   let memberAmt = document.form.memberAmt.value;
-  window.alert('This will generate approximately ' + memberAmt * 17 + ' years. Are you sure?');
+  // window.alert('This will generate approximately ' + memberAmt * 17 + ' years. Are you sure?');
   generateDynasty(dynastyAmt, memberAmt)
 
   e.preventDefault();

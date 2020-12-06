@@ -1,17 +1,11 @@
-export let adjectives = {
-    'full-good': [
-        'Philosopher', 'Scholar'
+export let types = {
+    'positive': [
+        'Stoic', 'Gregarious', 'Intelligent'
     ],
-    'semi-good': [
-        'Senator', 'Commander'
+    'neutral': [
+        'Curious', 'Bored', 'Longing'
     ],
-    'true-neutral': [
-        'Adventurer', 'Tinkerer'
-    ],
-    'semi-bad': [
-        'Gambler', 'Con Artist'
-    ],
-    'full-bad': [
-        'Mad Scientist', 'Addict'
+    'negative': [
+        'Cruel', 'Apathetic', 'Mean'
     ]
-};
+}

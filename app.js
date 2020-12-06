@@ -1,7 +1,9 @@
 let dynastyList = [];
 let dynastyNames;
 let names;
-import * as leaderTypes from './adjectives.js';
+import * as leaderTypes from './leaderTypes.js';
+import * as personalityTypes from './adjectives.js';
+import * as healthTypes from './adjectives.js';
 
 //shamelessly stole from stack overflow
 //https://stackoverflow.com/questions/9083037/convert-a-number-into-a-roman-numeral-in-javascript
@@ -245,35 +247,11 @@ function calculateHealth(dynastyName, iteration) {
     memberTraits.leaderTrait.type = 'full-bad';
   }
   
-
-  let personalityTypes = {
-    'positive': [
-      'Stoic', 'Gregarious', 'Intelligent'
-    ],
-    'neutral': [
-      'Curious', 'Bored', 'Longing'
-    ],
-    'negative': [
-      'Cruel', 'Apathetic', 'Mean'
-    ]
-  };
-
-  let healthTypes = {
-    'positive': [
-      'Brawny', 'Strong', 'Handsome'
-    ],
-    'neutral': [
-      'Thin', 'Well Rested', 'Content'
-    ],
-    'negative': [
-      'Sickly', 'Frail', 'Obese'
-    ]
-  }
   // console.log(leaderTypes.adjectives[memberTraits.leaderTrait.type][Math.floor(Math.random() * leaderTypes.adjectives[memberTraits.leaderTrait.type].length)]);
 
-  memberTraits.leaderTrait.name = leaderTypes.adjectives[memberTraits.leaderTrait.type][Math.floor(Math.random() * leaderTypes.adjectives[memberTraits.leaderTrait.type].length)];
-  memberTraits.personalityTrait.name = personalityTypes[memberTraits.personalityTrait.type][Math.floor(Math.random() * personalityTypes[memberTraits.personalityTrait.type].length)]
-  memberTraits.healthTrait.name = healthTypes[memberTraits.healthTrait.type][Math.floor(Math.random() * healthTypes[memberTraits.healthTrait.type].length)];
+  memberTraits.leaderTrait.name = leaderTypes.types[memberTraits.leaderTrait.type][Math.floor(Math.random() * leaderTypes.types[memberTraits.leaderTrait.type].length)];
+  memberTraits.personalityTrait.name = personalityTypes.types[memberTraits.personalityTrait.type][Math.floor(Math.random() * personalityTypes.types[memberTraits.personalityTrait.type].length)];
+  memberTraits.healthTrait.name = healthTypes.types[memberTraits.healthTrait.type][Math.floor(Math.random() * healthTypes.types[memberTraits.healthTrait.type].length)];
 
   let pt = memberTraits.personalityTrait.name;
   let lt = memberTraits.leaderTrait.name;

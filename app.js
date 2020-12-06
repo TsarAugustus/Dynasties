@@ -1,6 +1,7 @@
 let dynastyList = [];
 let dynastyNames;
 let names;
+import * as leaderTypes from './adjectives.js';
 
 //shamelessly stole from stack overflow
 //https://stackoverflow.com/questions/9083037/convert-a-number-into-a-roman-numeral-in-javascript
@@ -78,7 +79,7 @@ function displayDynasty() {
         let pt = member[dynasty].traits.personalityTrait.name;
         let lt = member[dynasty].traits.leaderTrait.name;
         let ht = member[dynasty].traits.healthTrait.name;
-        text = text + '</br> They were known to be ' + pt + ' towards others, and took a liking to the ' + lt + '\'s of their realm. Commoners would remark about their ' + ht + ' figure';
+        text = text + '</br> They were known to be ' + pt + ' towards others, and  took a liking to the ' + lt + '\'s of their realm. Commoners would remark about their ' + ht + ' figure';
       } else {
         text = member[dynasty].name + ' ' + conversion(member[dynasty].iteration) + ' was next in line to the throne of ' + member[dynasty-1].name + ' ' + conversion(member[dynasty - 1].iteration) + '. Their reign started on ' + member[dynasty].reignStart;
       }
@@ -243,23 +244,7 @@ function calculateHealth(dynastyName, iteration) {
   } else { //evil and sickly
     memberTraits.leaderTrait.type = 'full-bad';
   }
-  let leaderTypes = {
-    'full-good': [
-      'Philosopher', 'Scholar'
-    ],
-    'semi-good': [
-      'Senator', 'Commander'
-    ],
-    'true-neutral': [
-      'Adventurer', 'Tinkerer'
-    ],
-    'semi-bad': [
-      'Gambler', 'Con Artist'
-    ],
-    'full-bad': [
-      'Mad Scientist', 'Addict'
-    ]
-  };
+  
 
   let personalityTypes = {
     'positive': [
@@ -284,18 +269,16 @@ function calculateHealth(dynastyName, iteration) {
       'Sickly', 'Frail', 'Obese'
     ]
   }
-  memberTraits.leaderTrait.name = leaderTypes[memberTraits.leaderTrait.type][Math.floor(Math.random() * leaderTypes[memberTraits.leaderTrait.type].length)];
+  // console.log(leaderTypes.adjectives[memberTraits.leaderTrait.type][Math.floor(Math.random() * leaderTypes.adjectives[memberTraits.leaderTrait.type].length)]);
+
+  memberTraits.leaderTrait.name = leaderTypes.adjectives[memberTraits.leaderTrait.type][Math.floor(Math.random() * leaderTypes.adjectives[memberTraits.leaderTrait.type].length)];
   memberTraits.personalityTrait.name = personalityTypes[memberTraits.personalityTrait.type][Math.floor(Math.random() * personalityTypes[memberTraits.personalityTrait.type].length)]
   memberTraits.healthTrait.name = healthTypes[memberTraits.healthTrait.type][Math.floor(Math.random() * healthTypes[memberTraits.healthTrait.type].length)];
 
   let pt = memberTraits.personalityTrait.name;
   let lt = memberTraits.leaderTrait.name;
   let ht = memberTraits.healthTrait.name;
-  // PT = personalityType, LT = leaderType, HT = healthType
-  //they were known to be PT towards others, and took a liking to the LT of their realm. Commoners would remark about their HT figure.
   return memberTraits
-  // console.log('They were known to be ' + pt + ' towards others, and took a liking to the ' + lt + '\'s of their realm. Commoners would remark about their ' + ht + ' figure');
-
 } 
 
 function generateChildren(dynasty, memberIteration) {

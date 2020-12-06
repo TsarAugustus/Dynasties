@@ -3,7 +3,8 @@ let dynastyNames;
 let names;
 import * as leaderTypes from './leaderTypes.js';
 import * as personalityTypes from './adjectives.js';
-import * as healthTypes from './adjectives.js';
+import * as healthTypes from './health.js';
+import createDynasty from './createDynasty.js';
 
 //shamelessly stole from stack overflow
 //https://stackoverflow.com/questions/9083037/convert-a-number-into-a-roman-numeral-in-javascript
@@ -21,48 +22,7 @@ function conversion(num) {
     return Array(+digits.join("") + 1).join("M") + roman;
 }
 
-function generateNames(args) {
-  let newWords = [];
-  let vowel = ['a', 'e', 'i', 'o', 'u'];
-  let consonant = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z'];
-  //generate 30 random words
-  for(let i=0; i < 30; i++) {
-    let currentWord = [];
 
-    //generates word length. longer words are less likely
-    let wordLength = Math.floor(Math.pow(Math.random() * (3 - 2) + 2, Math.random() * (2.2 - 1.5) + 1.5)); //idk what the right length is, but this is close
-    let chance;
-    chance = Math.random();
-
-    //I don't like the current word generation. Need more looking into.
-    for(let j=0; j < wordLength; j++) {
-      if(j >= 2) {
-        for(let letter of consonant) {
-          if(currentWord[j-1] === letter) {
-            chance = 0;
-            break;
-          }
-        }
-      }
-
-      if(chance < 0.5) {
-        currentWord.push(vowel[Math.floor(Math.random() * vowel.length)]);
-        chance = Math.random()
-      } else {
-        currentWord.push(consonant[Math.floor(Math.random() * consonant.length)]);
-        chance = Math.random()
-      }
-
-    }
-    currentWord = currentWord.join('');
-    newWords[i] = currentWord.charAt(0).toUpperCase() + currentWord.slice(1);
-  }
-  if(args === 'dynastyNames') {
-    dynastyNames = newWords;
-  } else {
-    names = newWords;
-  }
-}
 
 function displayDynasty() {
   for(let i=0; i<dynastyList.length; i++) {
@@ -150,30 +110,8 @@ function displayDynasty() {
   }
 }
 
-function calculateHealth(dynastyName, iteration) {  
-  let previousMemberHealth = undefined;
-  let memberTraits = {
-    leaderTrait: {
-      name: undefined,
-      type: undefined
-    },
-    personalityTrait: {
-      name: undefined,
-      type: undefined
-    },
-    healthTrait: {
-      name: undefined,
-      type: undefined
-    }
-  }
-
-  //if there is a parent, get their traits
-  if(dynastyName.members[iteration - 1]) {
-    
-  } else { //if this is the founder, generate new traits and jazz
-
-  }
-  //generate overall health
+function calculateHealth(dynastyName, iteration, args) {  
+  //generate overall health ==========
   let healthNum = Math.random();
   let personalityTraitChance = Math.random();
   
@@ -188,75 +126,119 @@ function calculateHealth(dynastyName, iteration) {
 
   //ill is always less than neutral
   let illPos = 0.9;
-  let illNeut = 0.5;  
+  let illNeut = 0.5;
 
-  //essentially, if healthNum is above the healthy var, then the character is healthy
-  //otherwise, if they are  above the neutral range, but not healthy, then they are neutral
-  // or they are ill, if they are below the neutral threshold
-  if(healthNum >= healthy) { //healthy
-    memberTraits.healthTrait.type = 'positive';
-    if(personalityTraitChance >= healthyPos) {
-      memberTraits.personalityTrait.type = 'positive';
-    } else if (personalityTraitChance >= healthyNeut) {
-      memberTraits.personalityTrait.type = 'neutral';
-    } else {
-      memberTraits.personalityTrait.type = 'negative';
+  //mutation stuff
+  let mutateChance = 0.3;
+
+  // ===============================
+
+  let previousMemberHealth = undefined;
+  let memberTraits = {
+    leaderTrait: {
+      name: undefined,
+      type: undefined
+    },
+    personalityTrait: {
+      name: undefined,
+      type: undefined
+    },
+    healthTrait: {
+      name: undefined,
+      type: undefined
     }
-  } else if(healthNum >= neutral) { //neutral 
-    memberTraits.healthTrait.type = 'neutral';
-    if(personalityTraitChance >= neutralPos) {
-      memberTraits.personalityTrait.type = 'positive';
-    } else if (personalityTraitChance >= neutralNeut) {
-      memberTraits.personalityTrait.type = 'neutral';
-    } else {
-      memberTraits.personalityTrait.type = 'negative';
-    }
-  } else { //ill
-    memberTraits.healthTrait.type = 'negative';
-    if(personalityTraitChance >= illPos) {
-      memberTraits.personalityTrait.type = 'positive';
-    } else if (personalityTraitChance >= illNeut) {
-      memberTraits.personalityTrait.type = 'neutral';
-    } else {
-      memberTraits.personalityTrait.type = 'negative';
-    }
-  }
-  let netScore = 0;
-  for(let traitType in memberTraits) {
-    if(traitType != 'leaderTrait') {
-      if(memberTraits[traitType].type === 'positive') {
-        netScore = netScore + 0.5;
-      } else if (memberTraits[traitType].type === 'negative') {
-        netScore = netScore - 0.5;
+  };
+
+  //gets called for the founder, and whenever a mutation happens
+  function newTraits() {
+    //essentially, if healthNum is above the healthy var, then the character is healthy
+    //otherwise, if they are  above the neutral range, but not healthy, then they are neutral
+    // or they are ill, if they are below the neutral threshold
+    if(healthNum >= healthy) { //healthy
+      memberTraits.healthTrait.type = 'positive';
+      if(personalityTraitChance >= healthyPos) {
+        memberTraits.personalityTrait.type = 'positive';
+      } else if (personalityTraitChance >= healthyNeut) {
+        memberTraits.personalityTrait.type = 'neutral';
+      } else {
+        memberTraits.personalityTrait.type = 'negative';
+      }
+    } else if(healthNum >= neutral) { //neutral 
+      memberTraits.healthTrait.type = 'neutral';
+      if(personalityTraitChance >= neutralPos) {
+        memberTraits.personalityTrait.type = 'positive';
+      } else if (personalityTraitChance >= neutralNeut) {
+        memberTraits.personalityTrait.type = 'neutral';
+      } else {
+        memberTraits.personalityTrait.type = 'negative';
+      }
+    } else { //ill
+      memberTraits.healthTrait.type = 'negative';
+      if(personalityTraitChance >= illPos) {
+        memberTraits.personalityTrait.type = 'positive';
+      } else if (personalityTraitChance >= illNeut) {
+        memberTraits.personalityTrait.type = 'neutral';
+      } else {
+        memberTraits.personalityTrait.type = 'negative';
       }
     }
-  }
-
-  //probably a better way
-  //but I also need to fix how traits are applied
-  //TODO: FIX ALL THIS
-  if(netScore > 0.5) { //good healthy leader
-    memberTraits.leaderTrait.type = 'full-good';
-  } else if (netScore === 0.5) { //good semi competent
-    memberTraits.leaderTrait.type = 'semi-good';
-  } else if (netScore === 0) { //neutral
-    memberTraits.leaderTrait.type = 'true-neutral';
-  } else if (netScore === -0.5) { //bad semi competent
-    memberTraits.leaderTrait.type = 'semi-bad';
-  } else { //evil and sickly
-    memberTraits.leaderTrait.type = 'full-bad';
-  }
+    let netScore = 0;
+    for(let traitType in memberTraits) {
+      if(traitType != 'leaderTrait') {
+        if(memberTraits[traitType].type === 'positive') {
+          netScore = netScore + 0.5;
+        } else if (memberTraits[traitType].type === 'negative') {
+          netScore = netScore - 0.5;
+        }
+      }
+    }
   
-  // console.log(leaderTypes.adjectives[memberTraits.leaderTrait.type][Math.floor(Math.random() * leaderTypes.adjectives[memberTraits.leaderTrait.type].length)]);
+    //probably a better way
+    //but I also need to fix how traits are applied
+    //TODO: FIX ALL THIS
+    if(netScore > 0.5) { //good healthy leader
+      memberTraits.leaderTrait.type = 'full-good';
+    } else if (netScore === 0.5) { //good semi competent
+      memberTraits.leaderTrait.type = 'semi-good';
+    } else if (netScore === 0) { //neutral
+      memberTraits.leaderTrait.type = 'true-neutral';
+    } else if (netScore === -0.5) { //bad semi competent
+      memberTraits.leaderTrait.type = 'semi-bad';
+    } else { //evil and sickly
+      memberTraits.leaderTrait.type = 'full-bad';
+    }
 
-  memberTraits.leaderTrait.name = leaderTypes.types[memberTraits.leaderTrait.type][Math.floor(Math.random() * leaderTypes.types[memberTraits.leaderTrait.type].length)];
-  memberTraits.personalityTrait.name = personalityTypes.types[memberTraits.personalityTrait.type][Math.floor(Math.random() * personalityTypes.types[memberTraits.personalityTrait.type].length)];
-  memberTraits.healthTrait.name = healthTypes.types[memberTraits.healthTrait.type][Math.floor(Math.random() * healthTypes.types[memberTraits.healthTrait.type].length)];
+    memberTraits.leaderTrait.name = leaderTypes.types[memberTraits.leaderTrait.type][Math.floor(Math.random() * leaderTypes.types[memberTraits.leaderTrait.type].length)];
+    memberTraits.personalityTrait.name = personalityTypes.types[memberTraits.personalityTrait.type][Math.floor(Math.random() * personalityTypes.types[memberTraits.personalityTrait.type].length)];
+    memberTraits.healthTrait.name = healthTypes.types[memberTraits.healthTrait.type][Math.floor(Math.random() * healthTypes.types[memberTraits.healthTrait.type].length)];
+  }
 
-  let pt = memberTraits.personalityTrait.name;
-  let lt = memberTraits.leaderTrait.name;
-  let ht = memberTraits.healthTrait.name;
-  return memberTraits
+  //if there is a parent, get their traits
+  if(args === 'founder') { //if founder
+    console.log('in here')
+    newTraits();
+  } else if(args != 'founder' && args === true) { //if child of founder
+    //Get the parent personality type
+    if(iteration >= 1) {
+      console.log(dynastyName.members[iteration])
+    }
+    
+    // console.log('ay')
+    
+    // console.log(dynastyName.members[prevMemberIteration])
+    // memberTraits.personalityTrait.type = dynastyName.members[iteration].traits.personalityTrait.type
+    // memberTraits.healthTrait.type = dynastyName.members[iteration].traits.healthTrait.type
+    // memberTraits.leaderTrait.type = dynastyName.members[iteration].traits.leaderTrait.type
+    // //Get some new adjectives and such
+    // memberTraits.leaderTrait.name = leaderTypes.types[memberTraits.leaderTrait.type][Math.floor(Math.random() * leaderTypes.types[memberTraits.leaderTrait.type].length)];
+    // memberTraits.personalityTrait.name = personalityTypes.types[memberTraits.personalityTrait.type][Math.floor(Math.random() * personalityTypes.types[memberTraits.personalityTrait.type].length)];
+    // memberTraits.healthTrait.name = healthTypes.types[memberTraits.healthTrait.type][Math.floor(Math.random() * healthTypes.types[memberTraits.healthTrait.type].length)];
+  } else {
+    //mutation
+    newTraits();
+  }
+  console.log(memberTraits)
+  return memberTraits;
 } 
 
 function generateChildren(dynasty, memberIteration) {
@@ -269,7 +251,7 @@ function generateChildren(dynasty, memberIteration) {
       death: undefined,
       age: undefined,
       heir: false,
-      health: undefined,
+      traits: undefined,
       parents: [],
       iteration: 1
     };
@@ -291,15 +273,16 @@ function generateChildren(dynasty, memberIteration) {
         } else {
           newChild.name = dynasty.preferredRulerNames[Math.floor(Math.random() * dynasty.preferredRulerNames.length)].name;
         }
-        
+        newChild.traits = calculateHealth(dynasty, memberIteration);
       }
       childArray.push(newChild);
-    } else { //founder info
+    } else { //founder child info
       let mutateChance = Math.random();
       newChild.birth = Math.floor(Math.random() * (dynasty.members[memberIteration].death - (dynasty.members[memberIteration].birth + 14)) + (dynasty.members[memberIteration].birth + 14));
       newChild.death = newChild.birth + (Math.floor(Math.random() * (70 - 14) + 14))
       newChild.age = (newChild.death - newChild.birth);
       newChild.parents = findParents(dynasty, memberIteration, false);
+      newChild.traits = calculateHealth(dynasty, memberIteration, true)
       if(mutateChance >= 0.9) {
         newChild.name = names[Math.floor(Math.random() * names.length)]
       } else {
@@ -347,87 +330,9 @@ function findParents(dynastyName, iteration, args) {
   }
 }
 
-function generateDynasty(uniqueDynasties, heirAmt) {
-  //first, generate the individual dynasty (not including members)
-  for(let i=0; i<uniqueDynasties; i++) {
-    let dynasty = {
-      name: undefined,
-      members: [{
-        name: undefined,
-        birth: undefined,
-        death: undefined,
-        reignStart: undefined,
-        reignEnd: undefined,
-        founder: undefined,
-        traits: undefined,
-        iteration: undefined,
-        children: [],
-        parents: []
-      }],
-      preferredRulerNames: [{
-        name: undefined,
-        iteration: undefined
-      }]
-    }
-    generateNames('dynastyNames');
-    dynasty.name = dynastyNames[Math.floor(Math.random() * dynastyNames.length)];
-    //then generate the members of the dynastyList
-    for(let j=0; j<heirAmt; j++) {
-      //generate founding member
-      if(j == 0) {
-        generateNames();
-        let member = dynasty.members[j];
-        member.name = names[Math.floor(Math.random() * names.length)];
-        member.birth = Math.floor(Math.random() * (2000 - 0) + 0);
-        let minReign = member.birth + 14;
-        member.death = member.birth + Math.floor(Math.random() * (70 - 14) + 14);
-        member.reignStart = member.birth + Math.floor(Math.random() * (member.death - minReign) + 14);
-        member.reignEnd = member.death;
-        let prn = { name: member.name, iteration: 1 }
-        dynasty.preferredRulerNames[0] = prn;
-        member.founder = true;
-        member.iteration = 1;
-        member.children = generateChildren(dynasty, j);
-        member.parents = findParents(dynasty, j, true);
-        member.traits = calculateHealth(dynasty, j);
-      } else {
-        let member = {
-          name: undefined,
-          birth: undefined,
-          death: undefined,
-          reignStart: undefined,
-          reignEnd: undefined,
-          founder: undefined,
-          iteration: undefined,
-          children: [],
-          parents: []
-        };
 
-
-        let previousMember = dynasty.members[j-1];
-        let previousHeir = previousMember.children[0];
-        member.name = previousHeir.name;
-        member.birth = previousHeir.birth;
-        member.death = previousHeir.death;
-        member.reignStart = previousMember.death;
-        member.reignEnd = member.death;
-        member.founder = false;
-        member.iteration = previousHeir.iteration;
-        member.children = generateChildren(dynasty, j);
-        member.parents = findParents(dynasty, j, false)
-        dynasty.members.push(member)
-      }
-    }
-    dynastyList.push(dynasty)
-  }
-  displayDynasty();
-}
-
+// console.log(createDynasty())
 document.getElementById('formSubmit').addEventListener('click', function(e) {
-  let dynastyAmt = document.form.dynastyAmt.value;
-  let memberAmt = document.form.memberAmt.value;
-  // window.alert('This will generate approximately ' + memberAmt * 17 + ' years. Are you sure?');
-  generateDynasty(dynastyAmt, memberAmt)
-
+  createDynasty(document.form.years.value)
   e.preventDefault();
 });

@@ -1,11 +1,11 @@
 export let types = {
     'positive': [
-        'Stoic', 'Gregarious', 'Intelligent'
+        'Stoic', 'Generous', 'Kind', 'Friendly', 'Helpful', 'Patient'
     ],
     'neutral': [
-        'Curious', 'Bored', 'Longing'
+        'Curious', 'Bored', 'Bold', 'Strange', 'Proud', 'Serious', 'Shy'
     ],
     'negative': [
-        'Cruel', 'Apathetic', 'Mean'
+        'Cruel', 'Apathetic', 'Mean', 'Angry', 'Blunt', 'Picky', 'Unpleasant'
     ]
 }

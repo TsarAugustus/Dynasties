@@ -1,11 +1,11 @@
 export let types = {
     'positive': [
-      'Brawny', 'Strong', 'Handsome'
+      'Brawny', 'Strong', 'Handsome', 'Athletic', 'Curvy', 'Muscular'
     ],
     'neutral': [
-      'Thin', 'Well Rested', 'Content'
+      'Thin', 'Stout', 'Content', 'Slender', 'Petite', 'Plain'
     ],
     'negative': [
-      'Sickly', 'Frail', 'Obese'
+      'Sickly', 'Frail', 'Obese', 'Overweight', 'Rough'
     ]
   }

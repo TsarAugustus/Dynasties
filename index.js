@@ -1,3 +1,5 @@
+import { neutral } from './neutral.js';
+
 const generateSex = () => {
     return Math.random() > 0.5 ? 'Male' : 'Female';
 }
@@ -69,17 +71,38 @@ const generateEye = (eumelanin, pheomelanin) => {
     return { color }
 }
 
+const generateSkinColor = (melaninLevel) => {
+    if(melaninLevel >= 0) {
+        return 'Dark';
+    } else {
+        return 'Light';
+    }
+}
+
+const generateSkin = (eumelanin, pheomelanin) => {
+    const melaninLevel = eumelanin.total - pheomelanin.total;
+    const color = generateSkinColor(melaninLevel);
+    return { color }
+}
+
+const generateTraits = () => {
+    return {neutral: neutral[Math.floor(Math.random() * neutral.length)] }
+}
+
 const generatePerson = () => {
-    this.sex = generateSex();
     const eumelanin = generateEumelanin();
     const pheomelanin = generatePheomelanin();
-    this.hair = generateHair(eumelanin, pheomelanin);
-    this.eye = generateEye(eumelanin, pheomelanin);
-    return this;
+    return {
+        sex: generateSex(),
+        hair: generateHair(eumelanin, pheomelanin),
+        eye: generateEye(eumelanin, pheomelanin),
+        skin: generateSkin(eumelanin, pheomelanin),
+        traits: generateTraits()
+    };
 }
 
 let personList = {};
-const personIterations = 100;
+const personIterations = 1000;
 
 for(let i = -1; i<personIterations; i++) {
     const person = generatePerson();
@@ -111,6 +134,27 @@ for(let i = -1; i<personIterations; i++) {
         personList.eye[person.eye.color].percentage = (
             Math.round((personList.eye[person.eye.color].total / personIterations) * 100)
         );
+    }
+
+    if(!personList.skin) {
+        personList.skin = {};
+    } else if(!personList.skin[person.skin.color]) {
+        personList.skin[person.skin.color] = {total: 1, percentage: 0 }
+    } else {
+        personList.skin[person.skin.color].total++;
+        personList.skin[person.skin.color].percentage = (
+            Math.round((personList.skin[person.skin.color].total / personIterations) * 100)
+        );
+    }
+    if(!personList.traits) {
+        personList.traits = {};
+    } else if(!personList.traits[person.traits.neutral]) {
+        personList.traits[person.traits.neutral] = { total: 1, percentage: 0 }
+    } else {
+        personList.traits[person.traits.neutral].total++;
+        personList.traits[person.traits.neutral].percentage = (
+            Math.round((personList.traits[person.traits.neutral].total) / personIterations)
+        )
     }
 
 }

@@ -86,77 +86,123 @@ const generateSkin = (eumelanin, pheomelanin) => {
 }
 
 const generateTraits = () => {
-    return {neutral: neutral[Math.floor(Math.random() * neutral.length)] }
+    return { neutral: neutral[Math.floor(Math.random() * neutral.length)] }
 }
 
-const generatePerson = () => {
+const createName = (iterations, nameList) => {
+    // if(nameList.length === iterations) { return nameList }
+    const nameLength = Math.floor(Math.random() * 10) + 1
+    let name = '';
+    for(let i=0; i < nameLength; i++) {
+        const letters = ['a', 'b', 'c', 'd', 'e'];
+        const newLetter = letters[Math.floor(Math.random() * letters.length)];
+        // const newName = name.slice(0) + newLetter;
+        name += newLetter;
+    }
+    const newNameList = nameList.concat(name);
+    console.log(nameList)
+    return (iterations === nameList.length) ? nameList : createName(iterations, newNameList)
+    // if(name.length < nameLength) {
+    //     
+    //     
+    //     
+    //     if(newName === nameLength && nameList < iterations) {
+    //         const newNameList = nameList.concat(newName.join(''));
+    //         createName(iterations, '', newNameList, nameLength);
+    //     }
+    // }
+    // return (nameList === iterations) ? nameList : createName(iterations, '', nameList, nameLength)
+}
+
+const generateOrigin = (iterations) => {
+    const origins = createName(iterations / 2, []);
+    // console.log(origins)
+    return origins;
+
+    // return (iterations / 2 === newPreviousOrigins) ? newPreviousOrigins : generateOrigin(iterations, newPreviousOrigins);
+    // return createName('', Math.floor(Math.random() * 10 + 1));
+}
+
+const generatePerson = (iterations, personList) => {
     const eumelanin = generateEumelanin();
     const pheomelanin = generatePheomelanin();
-    return {
-        sex: generateSex(),
-        hair: generateHair(eumelanin, pheomelanin),
-        eye: generateEye(eumelanin, pheomelanin),
-        skin: generateSkin(eumelanin, pheomelanin),
-        traits: generateTraits()
-    };
+
+    const sex = generateSex();
+    const hair = generateHair(eumelanin, pheomelanin);
+    const eye = generateEye(eumelanin, pheomelanin);
+    const skin = generateSkin(eumelanin, pheomelanin);
+    const traits = generateTraits();
+    const origin = generateOrigin(iterations);
+    
+    const newPersonList = personList.concat({
+        sex,
+        hair,
+        eye,
+        skin,
+        traits,
+        origin
+    })
+    // const newPersonList = personList.concat(person)
+    return (iterations < personList.length) ? personList : generatePerson(iterations, newPersonList)
 }
 
-let personList = {};
-const personIterations = 1000;
+console.log(generatePerson(0, []))
 
-for(let i = -1; i<personIterations; i++) {
-    const person = generatePerson();
-    if(!personList.sex) {
-        personList.sex = {}
-    } else if(!personList.sex[person.sex]) {
-        personList.sex[person.sex] = 1;
-    } else {
-        personList.sex[person.sex]++;
-    }
+// let personList = {};
+// const personIterations = 100;
 
-    if(!personList.hair) {
-        personList.hair = {};
-    } else if(!personList.hair[person.hair.color]) {
-        personList.hair[person.hair.color] = {total: 1, percentage: 0};
-    } else {
-        personList.hair[person.hair.color].total++;
-        personList.hair[person.hair.color].percentage = (
-            Math.round((personList.hair[person.hair.color].total / personIterations) * 100)
-        );
-    }
+// for(let i = -1; i<personIterations; i++) {
+//     const person = generatePerson();
+//     if(!personList.sex) {
+//         personList.sex = {}
+//     } else if(!personList.sex[person.sex]) {
+//         personList.sex[person.sex] = 1;
+//     } else {
+//         personList.sex[person.sex]++;
+//     }
 
-    if(!personList.eye) {
-        personList.eye = {};
-    } else if(!personList.eye[person.eye.color]) {
-        personList.eye[person.eye.color] = {total: 1, percentage: 0 }
-    } else {
-        personList.eye[person.eye.color].total++;
-        personList.eye[person.eye.color].percentage = (
-            Math.round((personList.eye[person.eye.color].total / personIterations) * 100)
-        );
-    }
+//     if(!personList.hair) {
+//         personList.hair = {};
+//     } else if(!personList.hair[person.hair.color]) {
+//         personList.hair[person.hair.color] = {total: 1, percentage: 0};
+//     } else {
+//         personList.hair[person.hair.color].total++;
+//         personList.hair[person.hair.color].percentage = (
+//             Math.round((personList.hair[person.hair.color].total / personIterations) * 100)
+//         );
+//     }
 
-    if(!personList.skin) {
-        personList.skin = {};
-    } else if(!personList.skin[person.skin.color]) {
-        personList.skin[person.skin.color] = {total: 1, percentage: 0 }
-    } else {
-        personList.skin[person.skin.color].total++;
-        personList.skin[person.skin.color].percentage = (
-            Math.round((personList.skin[person.skin.color].total / personIterations) * 100)
-        );
-    }
-    if(!personList.traits) {
-        personList.traits = {};
-    } else if(!personList.traits[person.traits.neutral]) {
-        personList.traits[person.traits.neutral] = { total: 1, percentage: 0 }
-    } else {
-        personList.traits[person.traits.neutral].total++;
-        personList.traits[person.traits.neutral].percentage = (
-            Math.round((personList.traits[person.traits.neutral].total) / personIterations)
-        )
-    }
+//     if(!personList.eye) {
+//         personList.eye = {};
+//     } else if(!personList.eye[person.eye.color]) {
+//         personList.eye[person.eye.color] = {total: 1, percentage: 0 }
+//     } else {
+//         personList.eye[person.eye.color].total++;
+//         personList.eye[person.eye.color].percentage = (
+//             Math.round((personList.eye[person.eye.color].total / personIterations) * 100)
+//         );
+//     }
 
-}
+//     if(!personList.skin) {
+//         personList.skin = {};
+//     } else if(!personList.skin[person.skin.color]) {
+//         personList.skin[person.skin.color] = {total: 1, percentage: 0 }
+//     } else {
+//         personList.skin[person.skin.color].total++;
+//         personList.skin[person.skin.color].percentage = (
+//             Math.round((personList.skin[person.skin.color].total / personIterations) * 100)
+//         );
+//     }
+//     if(!personList.traits) {
+//         personList.traits = {};
+//     } else if(!personList.traits[person.traits.neutral]) {
+//         personList.traits[person.traits.neutral] = { total: 1, percentage: 0 }
+//     } else {
+//         personList.traits[person.traits.neutral].total++;
+//         personList.traits[person.traits.neutral].percentage = (
+//             Math.round((personList.traits[person.traits.neutral].total) / personIterations)
+//         )
+//     }
 
-console.log(personList)//JSON.stringify(personList, null, 4));
+// }
+// console.log(personList)//JSON.stringify(personList, null, 4));

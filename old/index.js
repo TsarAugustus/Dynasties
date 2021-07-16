@@ -90,37 +90,21 @@ const generateTraits = () => {
 }
 
 const createName = (iterations, nameList) => {
-    // if(nameList.length === iterations) { return nameList }
     const nameLength = Math.floor(Math.random() * 10) + 1
     let name = '';
     for(let i=0; i < nameLength; i++) {
         const letters = ['a', 'b', 'c', 'd', 'e'];
         const newLetter = letters[Math.floor(Math.random() * letters.length)];
-        // const newName = name.slice(0) + newLetter;
         name += newLetter;
     }
     const newNameList = nameList.concat(name);
     console.log(nameList)
     return (iterations === nameList.length) ? nameList : createName(iterations, newNameList)
-    // if(name.length < nameLength) {
-    //     
-    //     
-    //     
-    //     if(newName === nameLength && nameList < iterations) {
-    //         const newNameList = nameList.concat(newName.join(''));
-    //         createName(iterations, '', newNameList, nameLength);
-    //     }
-    // }
-    // return (nameList === iterations) ? nameList : createName(iterations, '', nameList, nameLength)
 }
 
 const generateOrigin = (iterations) => {
     const origins = createName(iterations / 2, []);
-    // console.log(origins)
     return origins;
-
-    // return (iterations / 2 === newPreviousOrigins) ? newPreviousOrigins : generateOrigin(iterations, newPreviousOrigins);
-    // return createName('', Math.floor(Math.random() * 10 + 1));
 }
 
 const generatePerson = (iterations, personList) => {
